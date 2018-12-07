@@ -13,11 +13,10 @@ func Clear() {
 	var (
 		cursor coord
 		w      dword
-		h      = getScreenBuf()
+		h      = getScreen()
 	)
 
-	s, cp := h.buf.size, h.buf.cursorPosition
-	total := dword((s.x - cp.x) + (s.y-cp.y)*s.x)
+	total := dword(h.size.x * h.size.y)
 
 	xFillConsoleOutputCharacter.Call(
 		uintptr(h.handle),
@@ -29,7 +28,7 @@ func Clear() {
 
 	xFillConsoleOutputAttribute.Call(
 		uintptr(h.handle),
-		uintptr(h.buf.attributes),
+		uintptr(h.attributes),
 		uintptr(total), *(*uintptr)(unsafe.Pointer(&cursor)),
 		uintptr(unsafe.Pointer(&w)),
 	)
@@ -37,7 +36,7 @@ func Clear() {
 
 // MoveTopLeft moves the cursor to the top left position of the screen
 func MoveTopLeft() {
-	h := getScreenBuf()
+	h := getScreen()
 
 	xSetConsoleCursorPosition.Call(
 		uintptr(h.handle),
@@ -45,14 +44,14 @@ func MoveTopLeft() {
 	)
 }
 
-func getScreenBuf() consoleScreenBufferInfoHandle {
+func getScreen() consoleScreenBufferInfoHandle {
 	h := consoleScreenBufferInfoHandle{
 		handle: syscall.Handle(os.Stdout.Fd()),
 	}
 
 	xGetConsoleScreenBufferInfo.Call(
 		uintptr(h.handle),
-		uintptr(unsafe.Pointer(&h.buf)),
+		uintptr(unsafe.Pointer(&h.consoleScreenBufferInfo)),
 	)
 
 	return h
@@ -95,5 +94,5 @@ type consoleScreenBufferInfo struct {
 
 type consoleScreenBufferInfoHandle struct {
 	handle syscall.Handle
-	buf    consoleScreenBufferInfo
+	consoleScreenBufferInfo
 }
