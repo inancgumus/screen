@@ -34,6 +34,42 @@ func Clear() {
 	)
 }
 
+// Clear clears the current line
+func ClearLine() {
+	var (
+		cursor coord
+		w      dword
+		h      = getScreen()
+	)
+
+	total := dword(h.size.x)
+
+	xFillConsoleOutputCharacter.Call(
+		uintptr(h.handle),
+		uintptr(' '),
+		uintptr(total),
+		*(*uintptr)(unsafe.Pointer(&cursor)),
+		uintptr(unsafe.Pointer(&w)),
+	)
+
+	xFillConsoleOutputAttribute.Call(
+		uintptr(h.handle),
+		uintptr(h.attributes),
+		uintptr(total), *(*uintptr)(unsafe.Pointer(&cursor)),
+		uintptr(unsafe.Pointer(&w)),
+	)
+}
+
+// MoveLeft moves the cursor to the left position of the screen
+func MoveLeft() {
+	h := getScreen()
+
+	xSetConsoleCursorPosition.Call(
+		uintptr(h.handle),
+		*(*uintptr)(unsafe.Pointer(&coord{0, h.cursorPosition.y})),
+	)
+}
+
 // MoveTopLeft moves the cursor to the top left position of the screen
 func MoveTopLeft() {
 	h := getScreen()
