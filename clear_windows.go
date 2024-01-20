@@ -4,6 +4,7 @@
 package screen
 
 import (
+	"fmt"
 	"os"
 	"syscall"
 	"unsafe"
@@ -49,7 +50,7 @@ func MoveTopLeft() {
 // returns outOfRange error if (x, y) is bigger than screen.Size()
 func MoveCursor(x, y uint16) error {
 	if a, b := Size(); int(x) > a || int(y) > b {
-		return outOfRange{}
+		return outOfRange{x, y}
 	}
 
 	h := getScreen()
@@ -115,8 +116,11 @@ type consoleScreenBufferInfoHandle struct {
 	consoleScreenBufferInfo
 }
 
-type outOfRange struct{}
+type outOfRange struct {
+	x uint16
+	y uint16
+}
 
 func (o outOfRange) Error() string {
-	return "(x, y) out of range"
+	return fmt.Sprintf("(%d, %d) out of range", o.x, o.y)
 }

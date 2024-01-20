@@ -19,14 +19,8 @@ func MoveTopLeft() {
 // returns outOfRange error if (x, y) is bigger than screen.Size()
 func MoveCursor(x, y uint16) error {
 	if a, b := Size(); int(x) > a || int(y) > b {
-		return outOfRange{}
+		return outOfRange{x, y}
 	}
 
 	fmt.Printf("\033[%d;%dH", x, y)
-}
-
-type outOfRange struct{}
-
-func (o outOfRange) Error() string {
-	return "(x, y) out of range"
 }
