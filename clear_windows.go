@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 package screen
@@ -44,6 +45,23 @@ func MoveTopLeft() {
 	)
 }
 
+// MoveCursor moves the cursor anywhere on the screen
+// returns outOfRange error if (x, y) is bigger than screen.Size()
+func MoveCursor(x, y uint16) error {
+	if a, b := Size(); int(x) > a || int(y) > b {
+		return outOfRange{}
+	}
+
+	h := getScreen()
+
+	xSetConsoleCursorPosition.Call(
+		uintptr(h.handle),
+		*(*uintptr)(unsafe.Pointer(&coord{x, y})),
+	)
+
+	return nil
+}
+
 func getScreen() consoleScreenBufferInfoHandle {
 	h := consoleScreenBufferInfoHandle{
 		handle: syscall.Handle(os.Stdout.Fd()),
@@ -66,15 +84,15 @@ var (
 )
 
 type (
-	wchar uint16
+	// wchar uint16
 	short int16
 	dword uint32
 	word  uint16
 )
 
 type coord struct {
-	x short
-	y short
+	x uint16
+	y uint16
 }
 
 type smallRect struct {
@@ -95,4 +113,10 @@ type consoleScreenBufferInfo struct {
 type consoleScreenBufferInfoHandle struct {
 	handle syscall.Handle
 	consoleScreenBufferInfo
+}
+
+type outOfRange struct{}
+
+func (o outOfRange) Error() string {
+	return "(x, y) out of range"
 }
