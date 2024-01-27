@@ -3,7 +3,7 @@ package screen
 import (
 	"os"
 
-	"golang.org/x/crypto/ssh/terminal"
+	terminal "golang.org/x/term"
 )
 
 // Size returns the width and height of the terminal screen

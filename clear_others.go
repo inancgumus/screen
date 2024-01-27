@@ -23,4 +23,14 @@ func MoveCursor(x, y uint16) error {
 	}
 
 	fmt.Printf("\033[%d;%dH", x, y)
+	return nil
+}
+
+type outOfRange struct {
+	x uint16
+	y uint16
+}
+
+func (o outOfRange) Error() string {
+	return fmt.Sprintf("(%d, %d) out of range", o.x, o.y)
 }
