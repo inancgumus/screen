@@ -19,5 +19,11 @@ func main() {
 		fmt.Println(time.Now())
 
 		time.Sleep(time.Second)
+
+		err := screen.MoveCursor(0, 0)
+		if err == nil {
+
+			time.Sleep(time.Second)
+		}
 	}
 }
